@@ -39,102 +39,46 @@
     <a class="skip" href="#contenu">Aller au contenu</a>
     <div class="flag" aria-hidden="true"><span></span><span></span><span></span></div>
 
-    <header class="site-header">
+    <header class="masthead">
       <div class="wrap">
-        <div class="brand">
-          <img src="./logos/okay-students.png" width="64" height="64" alt="OKAY Students" />
-          <div>
-            <p>OKAY Students · 19 novembre 2026</p>
-            <h1>Journée mondiale de l'entrepreneuriat féminin</h1>
-          </div>
-        </div>
-        <p class="intro" id="contenu">
-          Étudiante au Bénin, créez votre affiche pour la Journée mondiale de
-          l'entrepreneuriat féminin. Ajoutez votre photo, cadrez-la dans l'emplacement
-          prévu, puis téléchargez le visuel en PNG — prêt à publier sur Facebook,
-          LinkedIn, Instagram ou TikTok.
-        </p>
-        <p class="theme-line">
-          « Former, accompagner et libérer le potentiel entrepreneurial des femmes »
+        <p class="kicker">OKAY Students, organisateur · 19 novembre 2026</p>
+        <h1 id="contenu">
+          Journée mondiale de l’entrepreneuriat féminin
+        </h1>
+        <p class="dek">
+          Une affiche à votre nom, un message officiel à personnaliser,
+          à publier aujourd’hui.
         </p>
       </div>
     </header>
 
     <main>
       <div class="wrap studio">
-        <section class="panel" aria-labelledby="infos-title">
-          <h2 id="infos-title">Vos informations</h2>
-          <p class="lead">Elles apparaissent sous la photo, sur l'affiche et dans le texte de publication.</p>
-          <form id="form" class="fields" autocomplete="on">
-            <div class="pair">
-              <div class="field">
-                <label for="prenoms">Prénoms</label>
-                <input id="prenoms" name="prenoms" type="text" autocomplete="given-name" placeholder="Ex. Amen" />
-              </div>
-              <div class="field">
-                <label for="nom">Nom</label>
-                <input id="nom" name="nom" type="text" autocomplete="family-name" placeholder="Ex. ADJOVI" />
-              </div>
-            </div>
-            <div class="field">
-              <label for="filiere">Filière</label>
-              <input id="filiere" name="filiere" type="text" placeholder="Ex. Économie, Agronomie, Informatique" />
-            </div>
-            <div class="pair">
-              <div class="field">
-                <label for="annee">Année d'étude</label>
-                <input id="annee" name="annee" type="text" list="annees" placeholder="Ex. Licence 2" />
-                <datalist id="annees">
-                  <option value="Licence 1"></option>
-                  <option value="Licence 2"></option>
-                  <option value="Licence 3"></option>
-                  <option value="Master 1"></option>
-                  <option value="Master 2"></option>
-                  <option value="Doctorat"></option>
-                  <option value="BTS 1"></option>
-                  <option value="BTS 2"></option>
-                </datalist>
-              </div>
-              <div class="field">
-                <label for="universite">Université</label>
-                <input
-                  id="universite"
-                  name="universite"
-                  type="text"
-                  list="universites"
-                  autocomplete="organization"
-                  placeholder="Ex. Université d'Abomey-Calavi"
-                />
-                <datalist id="universites">
-                  <option value="Université d'Abomey-Calavi (UAC)"></option>
-                  <option value="Université de Parakou (UP)"></option>
-                  <option value="Université Nationale d'Agriculture (UNA)"></option>
-                  <option value="Université Nationale des Sciences, Technologies, Ingénierie et Mathématiques (UNSTIM)"></option>
-                  <option value="IRGIB Africa University"></option>
-                  <option value="Université Catholique de l'Afrique de l'Ouest (UCAO-UUB)"></option>
-                </datalist>
-              </div>
-            </div>
-            <div class="field">
-              <label for="projet">Mon projet ou mon idée <span style="font-weight:500;color:var(--muted)">(facultatif)</span></label>
-              <textarea id="projet" name="projet" maxlength="180" placeholder="Une courte phrase, si vous souhaitez la faire figurer sur l'affiche."></textarea>
-            </div>
-          </form>
-        </section>
-
         <section class="preview-col" aria-labelledby="affiche-title">
-          <h2 id="affiche-title">Votre affiche</h2>
-          <p class="preview-hint">
-            Touchez l'emplacement au centre pour ajouter une photo, puis faites-la glisser
-            pour la cadrer. Sur téléphone, pincez pour zoomer.
-          </p>
-          <div class="preview-frame">
-            <canvas id="poster" width="1080" height="1080" role="img" aria-label="Aperçu de l'affiche" tabindex="0"></canvas>
+          <div class="preview-heading">
+            <h2 id="affiche-title">Votre affiche</h2>
+            <p class="preview-hint">
+              Touchez le cercle pour ajouter une photo, puis faites-la glisser
+              pour la cadrer. Sur téléphone, pincez pour zoomer.
+            </p>
+          </div>
+          <div class="preview-frame" id="drop-frame">
+            <canvas
+              id="poster"
+              width="1080"
+              height="1080"
+              role="img"
+              aria-label="Aperçu de l'affiche"
+              tabindex="0"
+            ></canvas>
+            <div class="drop-veil" id="drop-veil" hidden>
+              <p>Déposez votre photo ici</p>
+            </div>
           </div>
           <div class="photo-tools">
             <div class="photo-actions">
               <button type="button" class="btn btn-secondary" id="photo-add">Ajouter une photo</button>
-              <button type="button" class="btn btn-ghost" id="photo-remove" hidden>Retirer la photo</button>
+              <button type="button" class="btn btn-ghost" id="photo-remove" hidden>Retirer</button>
               <input id="photo" class="sr-only" type="file" accept="image/*" />
             </div>
             <div class="zoom-row">
@@ -143,78 +87,185 @@
               <span id="zoom-value">1,0×</span>
             </div>
           </div>
-          <div class="download-row">
-            <button type="button" class="btn btn-primary btn-block" id="download">
-              Télécharger l'affiche
-            </button>
-          </div>
+          <p class="privacy">Votre photo reste sur votre appareil. Rien n’est envoyé sur un serveur.</p>
+        </section>
+
+        <section class="flow" aria-label="Parcours de création">
+          <ol class="progress" id="progress">
+            <li>
+              <button type="button" class="progress-btn is-current" data-step="1" aria-current="step">
+                <span class="n">1</span>
+                <span class="l">Photo</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="progress-btn" data-step="2">
+                <span class="n">2</span>
+                <span class="l">Infos</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="progress-btn" data-step="3">
+                <span class="n">3</span>
+                <span class="l">Publier</span>
+              </button>
+            </li>
+          </ol>
+
+          <form id="form" autocomplete="on">
+            <div class="panel is-active" data-panel="1" role="tabpanel">
+              <h2>Ajoutez votre photo</h2>
+              <p class="lead">
+                Une photo nette, de face de préférence. Vous pourrez la cadrer
+                directement sur l’affiche.
+              </p>
+              <button type="button" class="drop-card" id="drop-card">
+                <span class="drop-icon" aria-hidden="true"></span>
+                <strong>Déposez une image ici</strong>
+                <span>ou appuyez pour parcourir vos photos</span>
+              </button>
+              <div class="panel-nav">
+                <button type="button" class="btn btn-primary" data-next="2">Continuer</button>
+              </div>
+            </div>
+
+            <div class="panel" data-panel="2" role="tabpanel" hidden>
+              <h2>Vos informations</h2>
+              <p class="lead">
+                Elles apparaissent sous la photo, sur l’affiche, et dans le texte officiel de publication.
+              </p>
+              <div class="fields">
+                <div class="pair">
+                  <div class="field">
+                    <label for="prenoms">Prénoms</label>
+                    <input id="prenoms" name="prenoms" type="text" autocomplete="given-name" placeholder="Ex. Aïcha" />
+                  </div>
+                  <div class="field">
+                    <label for="nom">Nom</label>
+                    <input id="nom" name="nom" type="text" autocomplete="family-name" placeholder="Ex. DOSSOU" />
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="filiere">Filière / spécialité</label>
+                  <input id="filiere" name="filiere" type="text" placeholder="Ex. Économie, Agronomie, Informatique" />
+                </div>
+                <div class="pair">
+                  <div class="field">
+                    <label for="annee">Année d’étude</label>
+                    <input id="annee" name="annee" type="text" list="annees" placeholder="Ex. Licence 2" />
+                    <datalist id="annees">
+                      <option value="Licence 1"></option>
+                      <option value="Licence 2"></option>
+                      <option value="Licence 3"></option>
+                      <option value="Master 1"></option>
+                      <option value="Master 2"></option>
+                      <option value="Doctorat"></option>
+                      <option value="BTS 1"></option>
+                      <option value="BTS 2"></option>
+                    </datalist>
+                  </div>
+                  <div class="field">
+                    <label for="universite">Université ou établissement</label>
+                    <input
+                      id="universite"
+                      name="universite"
+                      type="text"
+                      list="universites"
+                      autocomplete="organization"
+                      placeholder="Ex. Université d'Abomey-Calavi"
+                    />
+                    <datalist id="universites">
+                      <option value="Université d'Abomey-Calavi (UAC)"></option>
+                      <option value="Université de Parakou (UP)"></option>
+                      <option value="Université Nationale d'Agriculture (UNA)"></option>
+                      <option value="Université Nationale des Sciences, Technologies, Ingénierie et Mathématiques (UNSTIM)"></option>
+                      <option value="IRGIB Africa University"></option>
+                      <option value="Université Catholique de l'Afrique de l'Ouest (UCAO-UUB)"></option>
+                    </datalist>
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="activite">Votre activité <span class="opt">(facultatif)</span></label>
+                  <textarea
+                    id="activite"
+                    name="activite"
+                    maxlength="220"
+                    rows="3"
+                    placeholder="Ex. Fondatrice de … / Je fabrique …"
+                  ></textarea>
+                  <p class="field-hint">
+                    Si vous confectionnez, fabriquez ou vendez déjà quelque chose, indiquez-le ici.
+                    Cette phrase s’ajoute uniquement au texte de publication, pas à l’affiche.
+                  </p>
+                </div>
+              </div>
+              <div class="panel-nav">
+                <button type="button" class="btn btn-ghost" data-next="1">Retour</button>
+                <button type="button" class="btn btn-primary" data-next="3">Continuer</button>
+              </div>
+            </div>
+
+            <div class="panel" data-panel="3" role="tabpanel" hidden>
+              <h2>Télécharger et publier</h2>
+              <p class="lead">
+                Téléchargez l’affiche au format carré, puis copiez le message officiel
+                déjà personnalisé avec vos informations.
+              </p>
+
+              <button type="button" class="btn btn-primary btn-block" id="download">
+                Télécharger l’affiche
+              </button>
+
+              <div class="success" id="success" hidden>
+                <p>
+                  <strong>Affiche prête.</strong>
+                  Copiez maintenant le texte et publiez les deux ensemble
+                  sur Facebook, LinkedIn, Instagram ou TikTok.
+                </p>
+              </div>
+
+              <div class="pub" id="pub-card">
+                <h3>Votre texte de publication</h3>
+                <div class="text-box">
+                  <pre id="pub-text"></pre>
+                </div>
+                <div class="copy-row">
+                  <button type="button" class="btn btn-primary btn-block" id="copy">
+                    Copier le texte
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-block" id="share" hidden>
+                    Partager
+                  </button>
+                  <span class="copy-status" id="copy-status" role="status" aria-live="polite"></span>
+                </div>
+              </div>
+
+              <div class="howto">
+                <h3>Comment publier</h3>
+                <ol>
+                  <li>Joignez l’affiche téléchargée (1080 × 1080) à votre publication.</li>
+                  <li>Collez le texte copié. Les informations que vous avez saisies y figurent déjà.</li>
+                  <li>
+                    Identifiez manuellement, sur chaque plateforme, les comptes officiels :
+                    Ministère des Petites et Moyennes Entreprises et de la Promotion de l’Emploi,
+                    ADPME, Global Entrepreneurship Network, GEW Benin, et Olusegun Charles Vidjannagni.
+                  </li>
+                </ol>
+              </div>
+
+              <div class="panel-nav">
+                <button type="button" class="btn btn-ghost" data-next="2">Retour</button>
+              </div>
+            </div>
+          </form>
         </section>
       </div>
-
-      <section class="wrap section" aria-labelledby="texte-title">
-        <h2 id="texte-title">Texte de publication</h2>
-        <p class="lead">
-          Trois versions, avec les cinq points demandés. Choisissez celle qui convient
-          à votre style, puis copiez-la dans votre publication.
-        </p>
-        <div class="tabs" role="tablist" aria-label="Versions du texte">
-          <button type="button" class="tab" role="tab" id="tab-formel" aria-selected="true" data-variant="formel">
-            Formel
-          </button>
-          <button type="button" class="tab" role="tab" id="tab-dynamique" aria-selected="false" data-variant="dynamique">
-            Dynamique
-          </button>
-          <button type="button" class="tab" role="tab" id="tab-court" aria-selected="false" data-variant="court">
-            Court <span class="tab-hint">TikTok, Instagram</span>
-          </button>
-        </div>
-        <div class="text-box">
-          <pre id="pub-text"></pre>
-          <div class="copy-row">
-            <button type="button" class="btn btn-secondary" id="copy">Copier le texte</button>
-            <span class="copy-status" id="copy-status" role="status" aria-live="polite"></span>
-          </div>
-        </div>
-        <p class="note">
-          Sur chaque plateforme, identifiez manuellement les comptes officiels :
-          Ministère des Petites et Moyennes Entreprises et de la Promotion de l'Emploi,
-          Agence de Développement des Petites et Moyennes Entreprises (ADPME),
-          Global Entrepreneurship Network, GEW Benin, et Olusegun Charles Vidjannagni.
-          Le nom seul n'envoie pas de notification : pensez à les identifier depuis
-          la liste de suggestions du réseau social.
-        </p>
-      </section>
-
-      <section class="wrap section" aria-labelledby="publier-title">
-        <h2 id="publier-title">Comment publier</h2>
-        <p class="lead">Deux ou trois publications, à votre goût, aujourd'hui 19 novembre 2026 et d'ici le lundi 23 novembre 2026.</p>
-        <ol class="steps">
-          <li>
-            <strong>Téléchargez l'affiche</strong> au format carré (1080 × 1080),
-            adapté à Facebook, LinkedIn, Instagram et TikTok. Sur téléphone,
-            vous pouvez aussi l'enregistrer dans vos photos, puis la joindre à votre publication.
-          </li>
-          <li>
-            <strong>Copiez le texte</strong> et collez-le dans votre post.
-            Les cinq points obligatoires y figurent déjà.
-          </li>
-          <li>
-            <strong>Identifiez les comptes officiels</strong> mentionnés ci-dessus,
-            puis publiez sur Facebook, LinkedIn, TikTok, Instagram ou un autre réseau
-            de votre choix.
-          </li>
-        </ol>
-      </section>
     </main>
 
     <footer class="site-footer">
       <div class="wrap">
-        <div class="footer-logos">
-          <img class="okay" src="./logos/okay-students.png" alt="OKAY Students" />
-          <img src="./logos/gew.png" alt="Global Entrepreneurship Week" />
-          <img src="./logos/wed.png" alt="Women's Entrepreneurship Day" />
-          <img src="./logos/meb-horizontal.png" alt="Mois de l'Entrepreneuriat au Bénin" />
-        </div>
+        <img class="footer-mark" src="./logos/okay-students.png" alt="OKAY Students" />
+        <p class="footer-org">OKAY Students, organisateur</p>
         <p class="credit">
           Réalisé par
           <a href="https://github.com/bienvenuessegnon">Bienvenu ESSEGNON</a>.
@@ -225,11 +276,11 @@
 
     <div class="modal" id="save-modal" hidden>
       <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="save-title">
-        <h2 id="save-title" style="margin:0;font-size:1.1rem;color:var(--green-dark)">Enregistrer l'affiche</h2>
-        <p>Appuyez longtemps sur l'image pour l'enregistrer dans vos photos, ou utilisez le bouton ci-dessous.</p>
+        <h2 id="save-title">Enregistrer l’affiche</h2>
+        <p>Appuyez longtemps sur l’image pour l’enregistrer dans vos photos, ou utilisez le bouton ci-dessous.</p>
         <img id="save-preview" alt="Affiche à enregistrer" />
         <div class="modal-actions">
-          <button type="button" class="btn btn-primary" id="save-share">Partager l'affiche</button>
+          <button type="button" class="btn btn-primary" id="save-share">Partager l’affiche</button>
           <button type="button" class="btn btn-secondary" id="save-close">Fermer</button>
         </div>
       </div>

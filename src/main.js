@@ -10,6 +10,9 @@ import "@fontsource/montserrat/800.css";
 import "@fontsource/montserrat/900.css";
 import "@fontsource/montserrat/500-italic.css";
 import "@fontsource/montserrat/600-italic.css";
+import "@fontsource/fraunces/600.css";
+import "@fontsource/fraunces/600-italic.css";
+import "@fontsource/fraunces/700-italic.css";
 import "./styles.css";
 
 import {
@@ -26,9 +29,10 @@ import {
   loadLogo,
   waitForFonts,
 } from "./poster.js";
-import { TEXT_VARIANTS, buildPublicationText } from "./texts.js";
+import { buildPublicationText } from "./texts.js";
 
 const VIEW_SIZE = 280;
+const FIELDS = ["nom", "prenoms", "filiere", "annee", "universite", "activite"];
 
 const state = {
   nom: "",
@@ -36,12 +40,12 @@ const state = {
   filiere: "",
   annee: "",
   universite: "",
-  projet: "",
+  activite: "",
   photo: null,
   crop: { zoom: 1, offsetX: 0, offsetY: 0, viewSize: VIEW_SIZE },
-  variant: "formel",
   logos: {},
   ready: false,
+  step: 1,
 };
 
 const els = {
@@ -55,8 +59,14 @@ const els = {
   download: document.getElementById("download"),
   pubText: document.getElementById("pub-text"),
   copy: document.getElementById("copy"),
+  share: document.getElementById("share"),
   copyStatus: document.getElementById("copy-status"),
-  tabs: [...document.querySelectorAll(".tab")],
+  success: document.getElementById("success"),
+  dropCard: document.getElementById("drop-card"),
+  dropFrame: document.getElementById("drop-frame"),
+  dropVeil: document.getElementById("drop-veil"),
+  progressBtns: [...document.querySelectorAll(".progress-btn")],
+  panels: [...document.querySelectorAll("[data-panel]")],
   modal: document.getElementById("save-modal"),
   savePreview: document.getElementById("save-preview"),
   saveShare: document.getElementById("save-share"),
@@ -66,6 +76,7 @@ const els = {
 let raf = 0;
 let exportCanvas = null;
 let pendingSaveFile = null;
+let dragDepth = 0;
 
 function studentFromState() {
   return {
@@ -74,7 +85,7 @@ function studentFromState() {
     filiere: state.filiere,
     annee: state.annee,
     universite: state.universite,
-    projet: state.projet,
+    activite: state.activite,
   };
 }
 
@@ -99,7 +110,7 @@ function renderPreview() {
 }
 
 function updateText() {
-  els.pubText.textContent = buildPublicationText(studentFromState(), state.variant);
+  els.pubText.textContent = buildPublicationText(studentFromState());
 }
 
 function syncPhotoControls() {
@@ -117,15 +128,38 @@ function setCrop(next) {
   scheduleDraw();
 }
 
+function goToStep(step) {
+  const next = Math.min(3, Math.max(1, Number(step) || 1));
+  state.step = next;
+  for (const panel of els.panels) {
+    const active = Number(panel.dataset.panel) === next;
+    panel.hidden = !active;
+    panel.classList.toggle("is-active", active);
+  }
+  for (const btn of els.progressBtns) {
+    const n = Number(btn.dataset.step);
+    btn.classList.toggle("is-current", n === next);
+    btn.classList.toggle("is-done", n < next);
+    if (n === next) btn.setAttribute("aria-current", "step");
+    else btn.removeAttribute("aria-current");
+  }
+}
+
 function bindForm() {
-  const fields = ["nom", "prenoms", "filiere", "annee", "universite", "projet"];
-  for (const name of fields) {
+  for (const name of FIELDS) {
     const input = els.form.elements[name];
+    if (!input) continue;
     input.addEventListener("input", () => {
       state[name] = input.value;
       scheduleDraw();
       updateText();
     });
+  }
+  for (const btn of els.form.querySelectorAll("[data-next]")) {
+    btn.addEventListener("click", () => goToStep(btn.dataset.next));
+  }
+  for (const btn of els.progressBtns) {
+    btn.addEventListener("click", () => goToStep(btn.dataset.step));
   }
 }
 
@@ -150,9 +184,41 @@ function removePhoto() {
   scheduleDraw();
 }
 
+function bindDropTarget(el, highlightEl) {
+  if (!el) return;
+  el.addEventListener("dragenter", (event) => {
+    event.preventDefault();
+    dragDepth += 1;
+    highlightEl.classList.add("is-dragover");
+    if (els.dropVeil && highlightEl === els.dropFrame) els.dropVeil.hidden = false;
+  });
+  el.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+  });
+  el.addEventListener("dragleave", () => {
+    dragDepth = Math.max(0, dragDepth - 1);
+    if (dragDepth === 0) {
+      highlightEl.classList.remove("is-dragover");
+      if (els.dropVeil) els.dropVeil.hidden = true;
+    }
+  });
+  el.addEventListener("drop", (event) => {
+    event.preventDefault();
+    dragDepth = 0;
+    highlightEl.classList.remove("is-dragover");
+    if (els.dropVeil) els.dropVeil.hidden = true;
+    const file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
+    onPhotoSelected(file).catch(() => {
+      els.copyStatus.textContent = "Cette image n'a pas pu être lue.";
+    });
+  });
+}
+
 function bindPhoto() {
   els.photoAdd.addEventListener("click", openFilePicker);
   els.photoRemove.addEventListener("click", removePhoto);
+  if (els.dropCard) els.dropCard.addEventListener("click", openFilePicker);
   els.photo.addEventListener("change", (event) => {
     const file = event.target.files && event.target.files[0];
     onPhotoSelected(file).catch(() => {
@@ -183,18 +249,9 @@ function bindPhoto() {
     setCrop,
     openFilePicker
   );
-}
 
-function bindTabs() {
-  for (const tab of els.tabs) {
-    tab.addEventListener("click", () => {
-      state.variant = tab.dataset.variant;
-      for (const other of els.tabs) {
-        other.setAttribute("aria-selected", String(other === tab));
-      }
-      updateText();
-    });
-  }
+  bindDropTarget(els.dropCard, els.dropCard);
+  bindDropTarget(els.dropFrame, els.dropFrame);
 }
 
 async function copyText() {
@@ -210,7 +267,9 @@ async function copyText() {
     sel.addRange(range);
     const ok = document.execCommand("copy");
     sel.removeAllRanges();
-    els.copyStatus.textContent = ok ? "Texte copié." : "Copie impossible, sélectionnez le texte manuellement.";
+    els.copyStatus.textContent = ok
+      ? "Texte copié."
+      : "Copie impossible, sélectionnez le texte manuellement.";
   }
   setTimeout(() => {
     if (els.copyStatus.textContent === "Texte copié.") els.copyStatus.textContent = "";
@@ -265,8 +324,15 @@ function triggerDownload(blob, name) {
 }
 
 function isIOS() {
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  return (
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+  );
+}
+
+function showSuccess() {
+  goToStep(3);
+  els.success.hidden = false;
 }
 
 function openSaveModal(blob, name) {
@@ -277,6 +343,7 @@ function openSaveModal(blob, name) {
   els.savePreview.src = url;
   pendingSaveFile = new File([blob], name, { type: "image/png" });
   els.modal.hidden = false;
+  showSuccess();
 }
 
 function closeSaveModal() {
@@ -298,6 +365,7 @@ async function downloadPoster() {
       openSaveModal(blob, name);
     } else {
       triggerDownload(blob, name);
+      showSuccess();
     }
   } catch (err) {
     els.copyStatus.textContent = "Le téléchargement a échoué. Réessayez.";
@@ -313,6 +381,7 @@ async function sharePoster() {
       await navigator.share({
         files: [pendingSaveFile],
         title: "Affiche WED 2026",
+        text: buildPublicationText(studentFromState()),
       });
       closeSaveModal();
       return;
@@ -323,36 +392,38 @@ async function sharePoster() {
   triggerDownload(pendingSaveFile, pendingSaveFile.name);
 }
 
-async function boot() {
-  bindForm();
-  bindPhoto();
-  bindTabs();
-  els.copy.addEventListener("click", copyText);
-  els.download.addEventListener("click", downloadPoster);
-  els.saveClose.addEventListener("click", closeSaveModal);
-  els.saveShare.addEventListener("click", sharePoster);
-  els.modal.addEventListener("click", (event) => {
-    if (event.target === els.modal) closeSaveModal();
-  });
+async function shareAll() {
+  try {
+    const canvas = renderExport();
+    const blob = await canvasToBlob(canvas);
+    const file = new File([blob], fileName(), { type: "image/png" });
+    const text = buildPublicationText(studentFromState());
+    const payload = { files: [file], title: "Affiche WED 2026", text };
+    if (navigator.canShare && navigator.canShare(payload)) {
+      await navigator.share(payload);
+      showSuccess();
+      return;
+    }
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: "Affiche WED 2026" });
+      await copyText();
+      showSuccess();
+      return;
+    }
+  } catch (err) {
+    if (err && err.name === "AbortError") return;
+  }
+  els.copyStatus.textContent = "Le partage n'est pas disponible. Téléchargez l'affiche, puis copiez le texte.";
+}
 
-  const [okay, gew, wed, mebH, mebV] = await Promise.all([
-    loadLogo("./logos/okay-students.png"),
-    loadLogo("./logos/gew.png"),
-    loadLogo("./logos/wed.png"),
-    loadLogo("./logos/meb-horizontal.png"),
-    loadLogo("./logos/meb-vertical.png"),
-    waitForFonts(),
-  ]);
-  state.logos = { okay, gew, wed, mebH, mebV };
-  state.ready = true;
-  renderPreview();
-  updateText();
-  syncPhotoControls();
+function bindShareButton() {
+  const supported = typeof navigator.canShare === "function";
+  els.share.hidden = !supported;
+  if (supported) els.share.addEventListener("click", shareAll);
 }
 
 function setStudent(data) {
-  const fields = ["nom", "prenoms", "filiere", "annee", "universite", "projet"];
-  for (const name of fields) {
+  for (const name of FIELDS) {
     if (data[name] !== undefined) {
       state[name] = data[name];
       const input = els.form.elements[name];
@@ -376,6 +447,34 @@ async function exportPngBlob() {
   return canvasToBlob(canvas);
 }
 
+async function boot() {
+  bindForm();
+  bindPhoto();
+  bindShareButton();
+  els.copy.addEventListener("click", copyText);
+  els.download.addEventListener("click", downloadPoster);
+  els.saveClose.addEventListener("click", closeSaveModal);
+  els.saveShare.addEventListener("click", sharePoster);
+  els.modal.addEventListener("click", (event) => {
+    if (event.target === els.modal) closeSaveModal();
+  });
+
+  const [okay, gew, wed, mebH, mebV] = await Promise.all([
+    loadLogo("./logos/okay-students.png"),
+    loadLogo("./logos/gew.png"),
+    loadLogo("./logos/wed.png"),
+    loadLogo("./logos/meb-horizontal.png"),
+    loadLogo("./logos/meb-vertical.png"),
+    waitForFonts(),
+  ]);
+  state.logos = { okay, gew, wed, mebH, mebV };
+  state.ready = true;
+  renderPreview();
+  updateText();
+  syncPhotoControls();
+  goToStep(1);
+}
+
 window.__WED__ = window.__GEW__ = {
   ready: () => state.ready,
   waitReady: () =>
@@ -388,19 +487,12 @@ window.__WED__ = window.__GEW__ = {
   setCrop,
   getState: () => ({
     ...studentFromState(),
-    variant: state.variant,
     hasPhoto: Boolean(state.photo),
+    step: state.step,
     crop: { ...state.crop },
   }),
-  setVariant: (id) => {
-    const tab = els.tabs.find((t) => t.dataset.variant === id);
-    if (tab) tab.click();
-  },
-  getText: (variant) => buildPublicationText(studentFromState(), variant || state.variant),
-  getAllTexts: () =>
-    Object.fromEntries(
-      TEXT_VARIANTS.map((v) => [v.id, buildPublicationText(studentFromState(), v.id)])
-    ),
+  goToStep,
+  getText: () => buildPublicationText(studentFromState()),
   exportPngBlob,
   renderPreview,
 };
