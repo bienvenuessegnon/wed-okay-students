@@ -1,0 +1,13 @@
+{
+  "name": "Affiches WED 2026 — OKAY Students",
+  "short_name": "WED OKAY",
+  "lang": "fr",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#2B1024",
+  "theme_color": "#2B1024",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
