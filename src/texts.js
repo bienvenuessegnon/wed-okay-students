@@ -30,7 +30,7 @@ export function buildPublicationText(student) {
   const activite = sentence(student.activite);
 
   const paragraphs = [
-    "🌍👩🏽‍🎓 JE ME JOINS À DES MILLIONS D'ÉTUDIANTES À TRAVERS LE MONDE POUR CÉLÉBRER LA JOURNÉE MONDIALE DE L'ENTREPRENEURIAT FÉMININ !",
+    "🌍👩‍🎓 JE ME JOINS À DES MILLIONS D'ÉTUDIANTES À TRAVERS LE MONDE POUR CÉLÉBRER LA JOURNÉE MONDIALE DE L'ENTREPRENEURIAT FÉMININ !",
     `Je suis ${name}, étudiante en ${filiere} à ${univ}, au Bénin. 🇧🇯`,
     activite,
     "En ce 19 novembre, à l'occasion du Women's Entrepreneurship Day (WED) en pleine Semaine mondiale de l'entrepreneuriat dans 200 pays et du Mois de l'Entrepreneuriat au Bénin (MEB), je célèbre toutes ces jeunes étudiantes qui osent entreprendre, innover, créer des opportunités, transformer leurs communautés et contribuer au développement de nos sociétés.",
